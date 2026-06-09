@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Dr. Soma Helik — Business Analyst & Product Owner based in Budapest. Translating business needs into data-driven products.">
+<title>Dr. Soma Helik — Business Analyst & Product Owner</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Ccircle cx='16' cy='16' r='10' fill='none' stroke='%239cdef2' stroke-width='2'/%3E%3Ccircle cx='16' cy='16' r='3' fill='%234d9fff'/%3E%3C/svg%3E">
+<style>
+  :root {
+    --bg: #0c0f14;
+    --bg2: #11151c;
+    --panel: #141923;
+    --fg: #e7f4f8;
+    --heading: #9cdef2;
+    --muted: #6b8a94;
+    --border: #233643;
+    --accent: #4d9fff;
+    --accent2: #80b9ff;
+    --cyan: #9cdef2;
+    --radius: 14px;
+    --ease: cubic-bezier(.2,.7,.2,1);
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--fg);
+    font-family: 'Inter', ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 28px; width: 100%; }
+  h1, h2, h3 { font-weight: 800; letter-spacing: -0.02em; line-height: 1.05; margin: 0; }
+  .mono { font-family: 'Fira Code', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+  /* Decorative / animated text isn't meant to be selected */
+  nav, .brand, .hero h1, .eyebrow, .section-title, .section-num, .contact-title,
+  .marquee, .tl-when, .scroll-hint, footer {
+    -webkit-user-select: none; -moz-user-select: none; user-select: none;
+  }
+
+  /* ===== Custom cursor ===== */
+  .cursor-dot, .cursor-ring {
+    position: fixed; top: 0; left: 0; z-index: 9999; pointer-events: none;
+    border-radius: 50%; transform: translate(-50%, -50%);
+    mix-blend-mode: difference;
+  }
+  .cursor-dot { width: 7px; height: 7px; background: #fff; }
+  .cursor-ring {
+    width: 34px; height: 34px; border: 1.5px solid #fff;
+    transition: width .25s var(--ease), height .25s var(--ease), opacity .25s var(--ease), background .25s var(--ease);
+  }
+  .cursor-ring.hover { width: 60px; height: 60px; background: rgba(255,255,255,0.12); }
+  body.has-cursor { cursor: none; }
+  body.has-cursor a, body.has-cursor button { cursor: none; }
+
+  /* ===== Scroll progress ===== */
+  .progress {
+    position: fixed; top: 0; left: 0; height: 2px; width: 0%;
+    background: linear-gradient(90deg, var(--cyan), var(--accent));
+    z-index: 200;
+  }
+
+  /* ===== Nav ===== */
+  nav {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    backdrop-filter: blur(12px);
+    background: rgba(12,15,20,0.55);
+    border-bottom: 1px solid rgba(35,54,67,0.6);
+  }
+  nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 800; font-size: 16px; color: var(--heading); }
+  .brand .mark { width: 22px; height: 22px; }
+  .nav-links { display: flex; align-items: center; gap: 26px; }
+  .nav-links a { color: var(--muted); font-size: 14px; font-weight: 600; position: relative; }
+  .nav-links a::after {
+    content: ""; position: absolute; left: 0; bottom: -4px; height: 2px; width: 0;
+    background: var(--accent); transition: width .3s var(--ease);
+  }
+  .nav-links a:hover { color: var(--fg); }
+  .nav-links a:hover::after { width: 100%; }
+  @media (max-width: 720px) { .nav-links { gap: 16px; } .nav-links a:not(.nav-cta) { display: none; } }
+
+  /* ===== Hero ===== */
+  .hero { position: relative; min-height: 100vh; display: flex; align-items: center; overflow: hidden; }
+  #hero-canvas { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
+  .hero-veil {
+    position: absolute; inset: 0; z-index: 1; pointer-events: none;
+    background: radial-gradient(1200px 600px at 70% 30%, transparent, rgba(12,15,20,0.55) 70%, var(--bg));
+  }
+  .hero .wrap { position: relative; z-index: 2; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 9px;
+    font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+    color: var(--cyan); margin-bottom: 22px;
+  }
+  .eyebrow .ping { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); position: relative; }
+  .eyebrow .ping::after {
+    content: ""; position: absolute; inset: 0; border-radius: 50%; background: var(--accent);
+    animation: ping 1.8s var(--ease) infinite;
+  }
+  @keyframes ping { 0% { transform: scale(1); opacity: .7; } 100% { transform: scale(3.4); opacity: 0; } }
+  .hero h1 {
+    font-size: clamp(40px, 7vw, 104px); letter-spacing: -0.04em;
+    text-shadow: 0 8px 40px rgba(0,0,0,0.5);
+  }
+  .hero h1 .line { display: block; overflow: hidden; }
+  /* words never break mid-character; line breaks only happen between words */
+  .hero h1 .word { display: inline-block; white-space: nowrap; }
+  .hero h1 .char { display: inline-block; will-change: transform; }
+  .hero h1 .accent { color: var(--accent); }
+  .hero .lede {
+    max-width: 560px; margin: 26px 0 34px; font-size: clamp(16px, 2vw, 20px); color: var(--fg);
+    opacity: .9;
+  }
+  .hero-cta { display: flex; gap: 14px; flex-wrap: wrap; }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 9px;
+    padding: 13px 22px; border-radius: 999px; font-weight: 700; font-size: 15px;
+    border: 1px solid var(--border); color: var(--fg); background: rgba(20,25,35,0.6);
+    transition: transform .2s var(--ease), border-color .2s var(--ease), background .2s var(--ease);
+  }
+  .btn:hover { transform: translateY(-2px); border-color: var(--accent); }
+  .btn.primary { background: linear-gradient(135deg, var(--accent), var(--accent2)); color: #1a0d0f; border: none; }
+  .btn.primary:hover { filter: brightness(1.08); }
+
+  /* scroll hint */
+  .scroll-hint {
+    position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 2;
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    color: var(--muted); font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+  }
+  .scroll-hint .mouse {
+    width: 22px; height: 34px; border: 2px solid var(--muted); border-radius: 12px; position: relative;
+  }
+  .scroll-hint .mouse::after {
+    content: ""; position: absolute; top: 6px; left: 50%; transform: translateX(-50%);
+    width: 3px; height: 7px; border-radius: 2px; background: var(--cyan);
+    animation: wheel 1.6s var(--ease) infinite;
+  }
+  @keyframes wheel { 0% { opacity: 0; transform: translate(-50%, 0); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, 10px); } }
+
+  /* ===== Section shell ===== */
+  section { position: relative; padding: 130px 0; }
+  .section-head { margin-bottom: 60px; }
+  .section-num { font-size: 14px; color: var(--accent); font-weight: 700; letter-spacing: 0.2em; }
+  .section-title { font-size: clamp(34px, 5.5vw, 68px); margin-top: 14px; }
+
+  /* reveal lines */
+  .reveal-line { display: block; overflow: hidden; }
+  .reveal-line > span { display: block; will-change: transform; }
+
+  /* ===== About ===== */
+  .about-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 64px; align-items: center; }
+  @media (max-width: 880px) { .about-grid { grid-template-columns: 1fr; gap: 40px; } }
+  .portrait {
+    position: relative; border-radius: 20px; overflow: hidden; aspect-ratio: 1/1;
+    border: 1px solid var(--border);
+    box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+  }
+  .portrait img {
+    width: 100%; height: 100%; object-fit: cover; display: block;
+    transition: transform .8s var(--ease);
+  }
+  .portrait:hover img { transform: scale(1.06); }
+  .about-body p { font-size: clamp(17px, 2.2vw, 22px); color: var(--fg); opacity: .92; }
+  .about-body p .hl { color: var(--cyan); }
+  .stat-row { display: flex; gap: 40px; margin-top: 34px; flex-wrap: wrap; }
+  .stat .n { font-size: 40px; font-weight: 800; color: var(--accent); }
+  .stat .l { font-size: 13px; color: var(--muted); letter-spacing: 0.05em; max-width: 150px; }
+  .creds { margin-top: 28px; font-size: 13px; color: var(--muted); border-left: 2px solid var(--accent); padding-left: 14px; }
+
+  /* ===== Experience timeline ===== */
+  .timeline { position: relative; margin-top: 20px; }
+  .timeline::before {
+    content: ""; position: absolute; left: 9px; top: 6px; bottom: 6px; width: 2px;
+    background: linear-gradient(180deg, var(--accent), var(--border));
+  }
+  @media (max-width: 620px) { .timeline::before { left: 7px; } }
+  .tl-item { position: relative; padding: 0 0 44px 44px; }
+  .tl-item:last-child { padding-bottom: 0; }
+  .tl-item::before {
+    content: ""; position: absolute; left: 3px; top: 6px; width: 14px; height: 14px;
+    border-radius: 50%; background: var(--bg); border: 2px solid var(--accent);
+    box-shadow: 0 0 0 4px rgba(77,159,255,0.12);
+  }
+  @media (max-width: 620px) { .tl-item { padding-left: 36px; } }
+  .tl-when { font-size: 13px; letter-spacing: 0.06em; color: var(--cyan); font-weight: 600; }
+  .tl-role { font-size: clamp(20px, 2.6vw, 28px); margin-top: 6px; }
+  .tl-where { color: var(--muted); font-weight: 600; margin-top: 2px; }
+  .tl-item ul { margin: 14px 0 0; padding-left: 18px; color: var(--fg); opacity: .88; }
+  .tl-item li { margin-bottom: 6px; }
+
+  /* ===== Marquee ===== */
+  .marquee { padding: 70px 0; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); overflow: hidden; }
+  .marquee-track { display: flex; gap: 60px; white-space: nowrap; will-change: transform; }
+  .marquee-track span {
+    font-size: clamp(40px, 8vw, 96px); font-weight: 800; letter-spacing: -0.03em;
+    color: transparent; -webkit-text-stroke: 1.5px var(--muted); text-stroke: 1.5px var(--muted);
+  }
+  .marquee-track span.fill { color: var(--accent); -webkit-text-stroke: 0; }
+
+  /* ===== Contact ===== */
+  #contact { text-align: center; }
+  .contact-title { font-size: clamp(40px, 8vw, 110px); }
+  .contact-title a { color: var(--fg); transition: color .3s var(--ease); }
+  .contact-title a:hover { color: var(--accent); }
+  .social { display: flex; gap: 28px; justify-content: center; margin-top: 46px; flex-wrap: wrap; }
+  .social a { color: var(--muted); font-weight: 600; font-size: 15px; position: relative; }
+  .social a:hover { color: var(--fg); }
+  footer { padding: 40px 0; border-top: 1px solid var(--border); color: var(--muted); font-size: 13px; }
+  footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+
+  /* ===== Reduced motion ===== */
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .eyebrow .ping::after, .scroll-hint .mouse::after { animation: none; }
+    .portrait:hover img { transform: none; }
+  }
+</style>
+</head>
+<body>
+  <div class="progress" id="progress"></div>
+  <div class="cursor-ring" id="cursorRing"></div>
+  <div class="cursor-dot" id="cursorDot"></div>
+
+  <nav>
+    <div class="wrap">
+      <div class="brand">
+        <svg class="mark" viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="10" fill="none" stroke="#9cdef2" stroke-width="2"/><circle cx="16" cy="16" r="3" fill="#4d9fff"/></svg>
+        <span>Dr. Soma Helik</span>
+      </div>
+      <div class="nav-links">
+        <a href="#about">About</a>
+        <a href="#experience">Experience</a>
+        <a href="#contact">Contact</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <header class="hero" id="top">
+    <canvas id="hero-canvas"></canvas>
+    <div class="hero-veil"></div>
+    <div class="wrap">
+      <span class="eyebrow"><span class="ping"></span> Business Analyst &amp; Product Owner · Budapest</span>
+      <h1 id="heroTitle">
+        <span class="line" data-line>I translate business chaos</span>
+        <span class="line" data-line>into <span class="accent">solutions</span>.</span>
+      </h1>
+      <p class="lede">The kind that turn “that takes us all day” into “that’s already done.”</p>
+      <div class="hero-cta">
+        <a href="#experience" class="btn primary" data-cursor>View experience</a>
+        <a href="mailto:heliksoma@gmail.com" class="btn" data-cursor>Get in touch</a>
+      </div>
+    </div>
+    <div class="scroll-hint"><div class="mouse"></div><span>Scroll</span></div>
+  </header>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-num mono">01 / About</div>
+        <h2 class="section-title reveal"><span class="reveal-line"><span>Hi, I'm Soma.</span></span></h2>
+      </div>
+      <div class="about-grid">
+        <div class="portrait" data-cursor>
+          <img src="pic.jpg" alt="Portrait of Dr. Soma Helik" loading="lazy">
+        </div>
+        <div class="about-body">
+          <p class="reveal">
+            <span class="reveal-line"><span>I translate business needs into <span class="hl">data-driven</span></span></span>
+            <span class="reveal-line"><span>solutions — through requirements gathering,</span></span>
+            <span class="reveal-line"><span>stakeholder collaboration, and dashboards that</span></span>
+            <span class="reveal-line"><span>turn raw operations into decisions.</span></span>
+          </p>
+          <div class="stat-row">
+            <div class="stat"><div class="n" data-count="7">0</div><div class="l">Years in finance, ops &amp; product</div></div>
+            <div class="stat"><div class="n" data-count="14">0</div><div class="l">% lift in monthly collections</div></div>
+            <div class="stat"><div class="n" data-count="3000">0</div><div class="l">Invoices automated / month</div></div>
+          </div>
+          <p class="creds mono">J.D. in Law, Károli Gáspár University · Google Data Analytics Certified · Hungarian (native), English (fluent)</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="section-num mono">02 / Experience</div>
+        <h2 class="section-title reveal"><span class="reveal-line"><span>Where I've worked.</span></span></h2>
+      </div>
+      <div class="timeline">
+        <div class="tl-item">
+          <div class="tl-when mono">Feb 2026 — Present</div>
+          <h3 class="tl-role">Product Owner</h3>
+          <div class="tl-where">WeCan Technology · Budapest (Remote)</div>
+          <ul>
+            <li>Translate client needs for custom AI chatbots and TikTok-focused initiatives (UAE market) into detailed technical specifications.</li>
+            <li>Document requirements and map business logic for a new API gateway and orchestration layer powering agentic workflows.</li>
+            <li>Primary liaison between non-technical stakeholders and a 6-person engineering team; own the backlog and lead daily standups.</li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="tl-when mono">Dec 2023 — Feb 2026</div>
+          <h3 class="tl-role">Business Analyst / Data Analyst</h3>
+          <div class="tl-where">Swapp (Dubai, UAE) · Budapest (Remote)</div>
+          <ul>
+            <li>Led end-to-end delivery of a debt collection platform, increasing monthly collections by 14% and saving 2 hours of daily manual work per person.</li>
+            <li>Architected an LLM-powered invoice extraction system for 3,000+ monthly supplier invoices, cutting 1.5 hours of daily work per team member.</li>
+            <li>Designed interactive Power BI and Redash dashboards giving senior management near real-time KPI visibility.</li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="tl-when mono">Apr 2022 — Nov 2023</div>
+          <h3 class="tl-role">Accounts Payable Analyst</h3>
+          <div class="tl-where">IFF – International Flavors &amp; Fragrances · Budapest</div>
+          <ul>
+            <li>Identified duplicate payments and invoice errors, generating $50,000 in monthly savings through data analysis.</li>
+            <li>Streamlined invoice workflows for 5% faster processing time.</li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="tl-when mono">Dec 2019 — Apr 2022</div>
+          <h3 class="tl-role">Finance Analyst</h3>
+          <div class="tl-where">United Nations – FAO · Budapest</div>
+          <ul>
+            <li>Validated and processed supplier, consultant, and vendor payments, ensuring compliance and accuracy.</li>
+            <li>Built monthly, quarterly, and annual financial reports and detected fraudulent invoices via cross-source validation.</li>
+          </ul>
+        </div>
+        <div class="tl-item">
+          <div class="tl-when mono">Apr 2018 — Jun 2019</div>
+          <h3 class="tl-role">Customer Solutions Coordinator</h3>
+          <div class="tl-where">DHL Supply Chain · Budapest</div>
+          <ul>
+            <li>Liaison between customers and internal teams, managing escalated issues and service quality.</li>
+            <li>Built SQL/Excel operational reports delivering insights that reduced costs by €3,000.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee" aria-hidden="true">
+    <div class="marquee-track" id="marquee">
+      <span>Business Analysis</span><span class="fill">Power BI</span><span>SQL</span><span class="fill">Python</span><span>Agile</span><span class="fill">Product</span><span>Stakeholders</span>
+      <span>Business Analysis</span><span class="fill">Power BI</span><span>SQL</span><span class="fill">Python</span><span>Agile</span><span class="fill">Product</span><span>Stakeholders</span>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="wrap">
+      <div class="section-num mono">03 / Contact</div>
+      <h2 class="contact-title reveal" style="margin-top:18px;">
+        <span class="reveal-line"><span>Let's turn “someday”</span></span>
+        <span class="reveal-line"><span>into <a href="mailto:heliksoma@gmail.com" data-cursor>“done”</a>.</span></span>
+      </h2>
+      <div class="social">
+        <a href="mailto:heliksoma@gmail.com" data-cursor>heliksoma@gmail.com</a>
+        <a href="tel:+36205715041" data-cursor>+36 20 571 5041</a>
+        <a href="https://www.linkedin.com/in/soma-helik-97b035141/" target="_blank" rel="noopener" data-cursor>LinkedIn</a>
+        <a href="#" data-cursor>Budapest, Hungary</a>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="wrap">
+      <span>© 2026 Dr. Soma Helik · Budapest, Hungary</span>
+      <span class="mono">J.D. in Law · Google Data Analytics Certified</span>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.14/dist/lenis.min.js"></script>
+  <script>
+  (function () {
+    "use strict";
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isTouch = window.matchMedia('(hover: none), (pointer: coarse)').matches;
+    const hasGSAP = typeof window.gsap !== 'undefined';
+    const hasLenis = typeof window.Lenis !== 'undefined';
+
+    /* ============================================================
+       1. SMOOTH SCROLL (Lenis) synced to GSAP ScrollTrigger
+       ============================================================ */
+    let lenis = null;
+    if (hasLenis && hasGSAP && !reduceMotion) {
+      gsap.registerPlugin(ScrollTrigger);
+      lenis = new Lenis({ duration: 1.1, smoothWheel: true });
+      lenis.on('scroll', ScrollTrigger.update);
+      gsap.ticker.add((time) => lenis.raf(time * 1000));
+      gsap.ticker.lagSmoothing(0);
+    } else if (hasGSAP) {
+      gsap.registerPlugin(ScrollTrigger);
+    }
+
+    /* ============================================================
+       2. SCROLL PROGRESS BAR
+       ============================================================ */
+    const progress = document.getElementById('progress');
+    const updateProgress = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight;
+      const p = max > 0 ? (window.scrollY / max) * 100 : 0;
+      progress.style.width = p + '%';
+    };
+    window.addEventListener('scroll', updateProgress, { passive: true });
+    updateProgress();
+
+    /* ============================================================
+       3. MAGNETIC CUSTOM CURSOR
+       ============================================================ */
+    if (!isTouch && !reduceMotion) {
+      document.body.classList.add('has-cursor');
+      const dot = document.getElementById('cursorDot');
+      const ring = document.getElementById('cursorRing');
+      let mx = innerWidth / 2, my = innerHeight / 2;
+      let rx = mx, ry = my;
+      window.addEventListener('mousemove', (e) => { mx = e.clientX; my = e.clientY; });
+      const renderCursor = () => {
+        rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+        dot.style.transform = `translate(${mx}px, ${my}px) translate(-50%, -50%)`;
+        ring.style.transform = `translate(${rx}px, ${ry}px) translate(-50%, -50%)`;
+        requestAnimationFrame(renderCursor);
+      };
+      renderCursor();
+      document.querySelectorAll('[data-cursor], a, button').forEach((el) => {
+        el.addEventListener('mouseenter', () => ring.classList.add('hover'));
+        el.addEventListener('mouseleave', () => ring.classList.remove('hover'));
+      });
+    } else {
+      document.getElementById('cursorDot').style.display = 'none';
+      document.getElementById('cursorRing').style.display = 'none';
+    }
+
+    /* ============================================================
+       4. HERO CANVAS — flow field that bends toward the cursor
+       ============================================================ */
+    const canvas = document.getElementById('hero-canvas');
+    let raf = null, running = false;
+    if (canvas && !reduceMotion) {
+      const ctx = canvas.getContext('2d');
+      let W = 0, H = 0, dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const pointer = { x: -9999, y: -9999, active: false };
+      let particles = [];
+
+      const resize = () => {
+        const r = canvas.getBoundingClientRect();
+        W = r.width; H = r.height;
+        canvas.width = W * dpr; canvas.height = H * dpr;
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        const target = Math.min(window.innerWidth < 720 ? 280 : 620, Math.floor((W * H) / 1600));
+        particles = [];
+        for (let i = 0; i < target; i++) {
+          particles.push({ x: Math.random() * W, y: Math.random() * H, vx: 0, vy: 0 });
+        }
+      };
+
+      // cheap pseudo-noise flow angle
+      const flow = (x, y, t) =>
+        Math.sin(x * 0.0018 + t) * Math.cos(y * 0.0021 - t * 0.7) * Math.PI * 1.4 +
+        Math.sin((x + y) * 0.0012 + t * 0.5) * Math.PI;
+
+      const loop = (now) => {
+        const t = now * 0.00018;
+        ctx.fillStyle = 'rgba(12,15,20,0.10)';
+        ctx.fillRect(0, 0, W, H);
+        for (const p of particles) {
+          const a = flow(p.x, p.y, t);
+          p.vx += Math.cos(a) * 0.10;
+          p.vy += Math.sin(a) * 0.10;
+          if (pointer.active) {
+            const dx = p.x - pointer.x, dy = p.y - pointer.y;
+            const d2 = dx * dx + dy * dy;
+            if (d2 < 26000) {
+              const f = (1 - d2 / 26000) * 1.6;
+              p.vx += (dx / Math.sqrt(d2 + 0.01)) * f;
+              p.vy += (dy / Math.sqrt(d2 + 0.01)) * f;
+            }
+          }
+          p.vx *= 0.92; p.vy *= 0.92;
+          const speed = Math.hypot(p.vx, p.vy);
+          p.x += p.vx; p.y += p.vy;
+          if (p.x < 0) p.x += W; if (p.x > W) p.x -= W;
+          if (p.y < 0) p.y += H; if (p.y > H) p.y -= H;
+          const hue = speed > 1.1 ? 'rgba(128,185,255,' : 'rgba(156,222,242,';
+          ctx.fillStyle = hue + Math.min(0.9, 0.25 + speed * 0.4) + ')';
+          ctx.fillRect(p.x, p.y, 1.6, 1.6);
+        }
+        raf = requestAnimationFrame(loop);
+      };
+
+      const start = () => { if (!running) { running = true; raf = requestAnimationFrame(loop); } };
+      const stop = () => { running = false; if (raf) cancelAnimationFrame(raf); };
+
+      window.addEventListener('mousemove', (e) => {
+        const r = canvas.getBoundingClientRect();
+        pointer.x = e.clientX - r.left; pointer.y = e.clientY - r.top; pointer.active = true;
+      });
+      window.addEventListener('mouseleave', () => { pointer.active = false; });
+      window.addEventListener('resize', resize);
+      resize();
+      ctx.fillStyle = '#0c0f14'; ctx.fillRect(0, 0, W, H);
+
+      // pause when hero scrolled offscreen
+      const heroEl = document.getElementById('top');
+      if ('IntersectionObserver' in window) {
+        new IntersectionObserver((entries) => {
+          entries[0].isIntersecting ? start() : stop();
+        }, { threshold: 0.02 }).observe(heroEl);
+      } else { start(); }
+    }
+
+    /* ============================================================
+       5. HERO NAME — char-by-char reveal on load
+       ============================================================ */
+    const splitChars = (lineEl) => {
+      const walk = (node) => {
+        const out = [];
+        node.childNodes.forEach((n) => {
+          if (n.nodeType === 3) {
+            // Split into words; wrap each word so it can't break mid-character.
+            n.textContent.split(/(\s+)/).forEach((part) => {
+              if (part === '') return;
+              if (/^\s+$/.test(part)) {
+                out.push(document.createTextNode(' '));
+                return;
+              }
+              const word = document.createElement('span');
+              word.className = 'word';
+              part.split('').forEach((ch) => {
+                const s = document.createElement('span');
+                s.className = 'char';
+                s.textContent = ch;
+                word.appendChild(s);
+              });
+              out.push(word);
+            });
+          } else if (n.nodeType === 1) {
+            const clone = n.cloneNode(false);
+            const inner = walk(n);
+            inner.forEach((c) => clone.appendChild(c));
+            out.push(clone);
+          }
+        });
+        return out;
+      };
+      const chars = walk(lineEl);
+      lineEl.textContent = '';
+      const flat = [];
+      const append = (parent, nodes) => nodes.forEach((n) => {
+        parent.appendChild(n);
+        if (n.classList && n.classList.contains('char')) flat.push(n);
+        else if (n.childNodes.length) {
+          // already appended children during walk via clone
+          n.querySelectorAll('.char').forEach((c) => flat.push(c));
+        }
+      });
+      append(lineEl, chars);
+      return flat;
+    };
+
+    if (hasGSAP) {
+      const allChars = [];
+      document.querySelectorAll('#heroTitle [data-line]').forEach((line) => {
+        splitChars(line).forEach((c) => allChars.push(c));
+      });
+      if (reduceMotion) {
+        gsap.set(allChars, { y: 0, opacity: 1 });
+      } else {
+        gsap.set(allChars, { yPercent: 115, opacity: 0 });
+        gsap.to(allChars, {
+          yPercent: 0, opacity: 1, duration: 0.9, ease: 'power4.out',
+          stagger: 0.025, delay: 0.25
+        });
+        gsap.from('.hero .eyebrow, .hero .lede, .hero-cta', {
+          y: 24, opacity: 0, duration: 0.9, ease: 'power3.out', stagger: 0.12, delay: 0.7
+        });
+      }
+    }
+
+    /* ============================================================
+       6. SCROLL-TRIGGERED LINE REVEALS + counters
+       ============================================================ */
+    if (hasGSAP && !reduceMotion) {
+      document.querySelectorAll('.reveal').forEach((block) => {
+        const lines = block.querySelectorAll('.reveal-line > span');
+        gsap.set(lines, { yPercent: 110 });
+        gsap.to(lines, {
+          yPercent: 0, duration: 0.9, ease: 'power4.out', stagger: 0.08,
+          scrollTrigger: { trigger: block, start: 'top 85%' }
+        });
+      });
+      document.querySelectorAll('[data-count]').forEach((el) => {
+        const target = +el.getAttribute('data-count');
+        const obj = { v: 0 };
+        gsap.to(obj, {
+          v: target, duration: 1.6, ease: 'power2.out',
+          scrollTrigger: { trigger: el, start: 'top 90%' },
+          onUpdate: () => { el.textContent = Math.round(obj.v); }
+        });
+      });
+      gsap.utils.toArray('.tl-item').forEach((item) => {
+        gsap.from(item, {
+          y: 30, opacity: 0, duration: 0.7, ease: 'power3.out',
+          scrollTrigger: { trigger: item, start: 'top 88%' }
+        });
+      });
+    } else {
+      document.querySelectorAll('[data-count]').forEach((el) => {
+        el.textContent = el.getAttribute('data-count');
+      });
+    }
+
+    /* ============================================================
+       7. VELOCITY-DRIVEN MARQUEE
+       ============================================================ */
+    const marquee = document.getElementById('marquee');
+    if (marquee && hasGSAP && !reduceMotion) {
+      let baseX = 0;
+      const halfWidth = () => marquee.scrollWidth / 2;
+      const wrapX = (x) => { const w = halfWidth(); return ((x % w) + w) % w; };
+      let lastScroll = window.scrollY, velo = 0, direction = -1;
+      window.addEventListener('scroll', () => {
+        velo = window.scrollY - lastScroll; lastScroll = window.scrollY;
+      }, { passive: true });
+      const tick = () => {
+        const boost = 1 + Math.min(Math.abs(velo) * 0.12, 6);
+        baseX += direction * boost * 0.6;
+        marquee.style.transform = `translateX(${-wrapX(-baseX)}px) skewX(${gsap.utils.clamp(-8, 8, velo * 0.4)}deg)`;
+        velo *= 0.9;
+        requestAnimationFrame(tick);
+      };
+      tick();
+    }
+
+    // keep ScrollTrigger measurements correct after image + font load
+    window.addEventListener('load', () => { if (hasGSAP) ScrollTrigger.refresh(); });
+  })();
+  </script>
+</body>
+</html>

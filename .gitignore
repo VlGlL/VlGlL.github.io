@@ -1,0 +1,6 @@
+# Keep the public Pages repo minimal — only publish the site
+.DS_Store
+*.zip
+soma_helik_resume.pdf
+odysseus-clone.html
+portfolio.html
